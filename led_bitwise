@@ -1,0 +1,85 @@
+
+// define pins in use
+// the pins should be ordered corresponding to LED segments a-h in order
+// (h refers to dot segment)
+int pins[] = {2, 3, 4, 6, 7, 8, 9};
+
+/*
+Use integer constants to identify possible segments
+There are 8 total segments possible, so we assign a bit value to each of them in order:
+1 
+2 6 3 1 
+8 4 2 6 8 4 2 1  - Integer values of bit
+---------------
+8 7 6 5 4 3 2 1  - Bit number
+---------------
+h g f e d c b a  - LED segment
+
+This allows us to use bitwise operators on an 8-bit integer (0-255) to determine what
+segments to light up. For example to display the number '2' segments a,b,d,e, and g must
+be activated. This corresponds to bits 1,2,4,5 and 7, giving an integer value of 
+1+2+8+16+64 = 91.
+*/
+const int LED_0 = (127-64); // yes, I got lazy and let the program do the math
+const int LED_1 = (2+4);        
+const int LED_2 = 91;
+const int LED_3 = (1+2+4+8+64);
+const int LED_4 = (2+4+32+64);
+const int LED_5 = (1+4+8+32+64);
+const int LED_6 = (1+4+8+16+32+64);
+const int LED_7 = (1+2+4);
+const int LED_8 = 127;
+const int LED_9 = (1+2+4+8+32+64);
+
+void clearAll() {
+  // loop through pins and clear
+  for (int c = 0; c < 8; c++) {
+    digitalWrite(pins[c], LOW);
+  }
+}
+
+/*
+Use a series of bitwise ANDs to determine which pins to set
+*/
+void setLED(int value) {
+  clearAll(); // clear current display
+  if (value & 1) digitalWrite(pins[0], HIGH);
+  if (value & 2) digitalWrite(pins[1], HIGH);
+  if (value & 4) digitalWrite(pins[2], HIGH);
+  if (value & 8) digitalWrite(pins[3], HIGH);
+  if (value & 16) digitalWrite(pins[4], HIGH);
+  if (value & 32) digitalWrite(pins[5], HIGH);
+  if (value & 64) digitalWrite(pins[6], HIGH);
+  if (value & 128) digitalWrite(pins[7], HIGH);
+}
+
+void setup() {
+  // init pins for LED segments
+  // get number of elements in pins array
+  // ref: http://stackoverflow.com/questions/37538/how-do-i-determine-the-size-of-my-array-in-c
+  int p = sizeof(pins) / sizeof(pins[0]); 
+  for (int c = 0; c < p; c++) {
+    pinMode(pins[c], OUTPUT);
+  }
+}
+
+void loop() {
+  /*
+  Now just set the characters to display on the LED.
+  
+  We could do:
+  setLED(LED_0);
+  delay(1000);
+  setLED(LED_1);
+  delay(1000);
+  ... and so on, but I prefer to put the chars in an array and loop through the array:
+  */
+
+  int charsToDisplay[] = {LED_0, LED_1, LED_2, LED_3, LED_4, LED_5, LED_6, LED_7, LED_8, LED_9};
+  int s = sizeof(charsToDisplay) / sizeof(charsToDisplay[0]);
+  for (int c = 0; c < s; c++) {
+    setLED(charsToDisplay[c]);
+    delay(500);
+  }
+  
+}
